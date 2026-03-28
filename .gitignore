@@ -1,0 +1,47 @@
+# Flutter
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+.pub-cache/
+.pub/
+build/
+flutter_*.png
+variant/
+
+# Android
+android/app/google-services.json
+android/app/src/main/AndroidManifest.xml
+android/.gradle/
+android/app/build/
+*.jks
+*.keystore
+
+# iOS
+ios/Runner/GoogleService-Info.plist
+ios/Pods/
+ios/.symlinks/
+ios/Podfile.lock
+*.xcworkspace
+
+# Supabase
+.env
+.env.local
+supabase/.env
+
+# Firebase
+firebase-debug.log
+firebase.json
+
+# IDEs
+.idea/
+.vscode/
+*.iml
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Secrets
+*.env
+credentials.json
