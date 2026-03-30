@@ -2,10 +2,15 @@ import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geolocator/geolocator.dart';
 import '../../data/models/location_model.dart';
+import '../../data/models/place_model.dart';
 import '../../data/repositories/location_repository.dart';
 import '../../data/repositories/place_repository.dart';
+import '../../core/services/notification_service.dart';
+import '../../core/services/realtime_service.dart';
+import '../../core/services/background_location_service.dart';
 import 'auth_provider.dart';
 import 'circle_provider.dart';
+import 'settings_provider.dart';
 
 final locationRepositoryProvider = Provider<LocationRepository>((ref) {
   final client = ref.watch(supabaseClientProvider);
@@ -15,6 +20,27 @@ final locationRepositoryProvider = Provider<LocationRepository>((ref) {
 final placeRepositoryProvider = Provider<PlaceRepository>((ref) {
   final client = ref.watch(supabaseClientProvider);
   return PlaceRepository(client);
+});
+
+final realtimeLocationServiceProvider = Provider<RealtimeLocationService>((ref) {
+  final client = ref.watch(supabaseClientProvider);
+  return RealtimeLocationService(client);
+});
+
+final backgroundLocationServiceProvider = Provider<BackgroundLocationService>((ref) {
+  return BackgroundLocationService();
+});
+
+final realtimeLocationsProvider = StreamProvider<List<LocationModel>>((ref) {
+  final realtimeService = ref.watch(realtimeLocationServiceProvider);
+  final circleAsync = ref.watch(circleNotifierProvider);
+  final circle = circleAsync.valueOrNull;
+  
+  if (circle == null) {
+    return Stream.value([]);
+  }
+  
+  return realtimeService.locationStream;
 });
 
 final currentPositionProvider = FutureProvider<Position?>((ref) async {
@@ -32,11 +58,7 @@ final currentPositionProvider = FutureProvider<Position?>((ref) async {
       return null;
     }
 
-    return await Geolocator.getCurrentPosition(
-      locationSettings: const LocationSettings(
-        accuracy: LocationAccuracy.high,
-      ),
-    );
+    return await Geolocator.getCurrentPosition();
   } catch (e) {
     return null;
   }
@@ -51,6 +73,14 @@ final circleLocationsProvider = FutureProvider<List<LocationModel>>((ref) async 
   return repository.getMemberLocations(circle.id);
 });
 
+final userVisitsProvider = FutureProvider<List<PlaceVisitModel>>((ref) async {
+  final user = ref.watch(currentUserProvider);
+  if (user == null) return [];
+
+  final repository = ref.watch(placeRepositoryProvider);
+  return repository.getUserVisits(user.id);
+});
+
 class LocationTrackerNotifier extends StateNotifier<bool> {
   final LocationRepository _locationRepository;
   final PlaceRepository _placeRepository;
@@ -59,6 +89,11 @@ class LocationTrackerNotifier extends StateNotifier<bool> {
   Timer? _uploadTimer;
   Position? _lastPosition;
   String? _currentCircleId;
+  String? _currentUserId;
+  String? _currentPlaceId;
+  String? _currentVisitId;
+  final Set<String> _visitedPlaces = {};
+  bool _isBackgroundMode = false;
 
   LocationTrackerNotifier(
     this._locationRepository,
@@ -66,40 +101,66 @@ class LocationTrackerNotifier extends StateNotifier<bool> {
     this._ref,
   ) : super(false);
 
-  Future<void> startTracking() async {
+  Future<void> startTracking({bool backgroundMode = false}) async {
     if (state) return;
+
+    final settings = _ref.read(settingsProvider);
+    if (!settings.locationSharing) {
+      return;
+    }
 
     final circle = _ref.read(circleNotifierProvider).valueOrNull;
     if (circle == null) return;
 
+    final user = _ref.read(currentUserProvider);
+    if (user == null) return;
+
     _currentCircleId = circle.id;
-    
+    _currentUserId = user.id;
+    _isBackgroundMode = backgroundMode;
+
     // Check permission
     final permission = await Geolocator.checkPermission();
     if (permission == LocationPermission.denied) {
       await Geolocator.requestPermission();
     }
 
-    // Start listening to location updates
-    _positionSubscription = Geolocator.getPositionStream(
-      locationSettings: const LocationSettings(
-        accuracy: LocationAccuracy.high,
-        distanceFilter: 10,
-      ),
-    ).listen((position) {
-      _lastPosition = position;
-    });
-
-    // Upload location every 30 seconds
-    _uploadTimer = Timer.periodic(const Duration(seconds: 30), (_) {
-      _uploadCurrentLocation();
-    });
+    if (backgroundMode) {
+      await _startBackgroundTracking(circle.id, user.id, settings.trackingIntervalSeconds);
+    } else {
+      await _startForegroundTracking(settings.trackingIntervalSeconds);
+    }
 
     state = true;
   }
 
+  Future<void> _startForegroundTracking(int intervalSeconds) async {
+    // Start listening to location updates
+    _positionSubscription = Geolocator.getPositionStream().listen((position) {
+      _lastPosition = position;
+    });
+
+    // Upload location based on settings
+    _uploadTimer = Timer.periodic(Duration(seconds: intervalSeconds), (_) {
+      _uploadCurrentLocation();
+    });
+  }
+
+  Future<void> _startBackgroundTracking(String circleId, String userId, int intervalSeconds) async {
+    final backgroundService = _ref.read(backgroundLocationServiceProvider);
+    await backgroundService.initialize();
+    await backgroundService.startService(
+      circleId: circleId,
+      userId: userId,
+      intervalSeconds: intervalSeconds,
+    );
+  }
+
   Future<void> _uploadCurrentLocation() async {
     if (_lastPosition == null || _currentCircleId == null) return;
+
+    final settings = _ref.read(settingsProvider);
+    if (!settings.locationSharing) return;
 
     final user = _ref.read(currentUserProvider);
     if (user == null) return;
@@ -123,7 +184,7 @@ class LocationTrackerNotifier extends StateNotifier<bool> {
   }
 
   Future<void> _checkGeofences(double latitude, double longitude) async {
-    if (_currentCircleId == null) return;
+    if (_currentCircleId == null || _currentUserId == null) return;
 
     try {
       final insidePlaces = await _placeRepository.checkGeofences(
@@ -132,9 +193,41 @@ class LocationTrackerNotifier extends StateNotifier<bool> {
         longitude: longitude,
       );
 
-      // Process geofence events
+      final insidePlaceIds = insidePlaces.map((p) => p.id).toSet();
+
+      // Check for arrivals
       for (final place in insidePlaces) {
-        // TODO: Send notification
+        if (!_visitedPlaces.contains(place.id)) {
+          _visitedPlaces.add(place.id);
+          _currentPlaceId = place.id;
+          final visit = await _placeRepository.recordArrival(
+            placeId: place.id,
+            userId: _currentUserId!,
+          );
+          _currentVisitId = visit.id;
+
+          // Send notification
+          if (_ref.read(settingsProvider).pushNotifications) {
+            await NotificationService().showArrivalNotification(place.name);
+          }
+        }
+      }
+
+      // Check for departures
+      final departedPlaces = _visitedPlaces.difference(insidePlaceIds);
+      for (final placeId in departedPlaces) {
+        if (_currentVisitId != null && _currentPlaceId == placeId) {
+          await _placeRepository.recordDeparture(_currentVisitId!);
+          
+          final place = insidePlaces.firstWhere((p) => p.id == placeId, orElse: () => insidePlaces.first);
+          if (_ref.read(settingsProvider).pushNotifications) {
+            await NotificationService().showDepartureNotification(place.name, Duration(minutes: 5));
+          }
+          
+          _currentVisitId = null;
+          _currentPlaceId = null;
+        }
+        _visitedPlaces.remove(placeId);
       }
     } catch (e) {
       // Handle error
@@ -146,6 +239,13 @@ class LocationTrackerNotifier extends StateNotifier<bool> {
     _positionSubscription = null;
     _uploadTimer?.cancel();
     _uploadTimer = null;
+    
+    if (_isBackgroundMode) {
+      _ref.read(backgroundLocationServiceProvider).stopService();
+    }
+    
+    _visitedPlaces.clear();
+    _currentVisitId = null;
     state = false;
   }
 

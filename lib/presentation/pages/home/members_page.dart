@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../providers/circle_provider.dart';
 
@@ -54,14 +55,15 @@ class MembersPage extends ConsumerWidget {
         },
       ),
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => _showInviteDialog(context),
+        onPressed: () => _showInviteDialog(context, ref),
         icon: const Icon(Icons.person_add),
         label: const Text('Invite'),
       ),
     );
   }
 
-  void _showInviteDialog(BuildContext context) {
+  void _showInviteDialog(BuildContext context, WidgetRef ref) {
+    final circle = ref.read(circleNotifierProvider).valueOrNull;
     final codeController = TextEditingController();
     
     showDialog(
@@ -74,21 +76,37 @@ class MembersPage extends ConsumerWidget {
           children: [
             const Text('Share this code with your family member:'),
             const SizedBox(height: 16),
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: Colors.grey[200],
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: const Text(
-                'ABC123',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  letterSpacing: 4,
+            GestureDetector(
+              onTap: () {
+                if (circle?.inviteCode != null) {
+                  Clipboard.setData(ClipboardData(text: circle!.inviteCode));
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Code copied!')),
+                  );
+                }
+              },
+              child: Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Colors.grey[200],
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Text(
+                  circle?.inviteCode ?? '------',
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 4,
+                  ),
                 ),
               ),
+            ),
+            const SizedBox(height: 8),
+            const Text(
+              'Tap to copy',
+              textAlign: TextAlign.center,
+              style: TextStyle(color: Colors.grey, fontSize: 12),
             ),
             const SizedBox(height: 24),
             const Text('Or enter a code to join:'),
@@ -108,12 +126,23 @@ class MembersPage extends ConsumerWidget {
             child: const Text('Close'),
           ),
           ElevatedButton(
-            onPressed: () {
+            onPressed: () async {
               if (codeController.text.isNotEmpty) {
                 Navigator.pop(context);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Joining circle...')),
-                );
+                try {
+                  await ref.read(circleNotifierProvider.notifier).joinCircle(codeController.text.toUpperCase());
+                  if (context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Joined circle successfully!')),
+                    );
+                  }
+                } catch (e) {
+                  if (context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('Error joining circle: $e')),
+                    );
+                  }
+                }
               }
             },
             child: const Text('Join'),

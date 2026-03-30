@@ -5,6 +5,7 @@ import '../circle/onboarding_circle_page.dart';
 import 'map_page.dart';
 import 'members_page.dart';
 import 'places_page.dart';
+import 'history_page.dart';
 import 'settings_page.dart';
 
 class HomePage extends ConsumerStatefulWidget {
@@ -21,6 +22,7 @@ class _HomePageState extends ConsumerState<HomePage> {
     MapPage(),
     MembersPage(),
     PlacesPage(),
+    HistoryPage(),
     SettingsPage(),
   ];
 
@@ -60,6 +62,11 @@ class _HomePageState extends ConsumerState<HomePage> {
                 icon: Icon(Icons.place_outlined),
                 activeIcon: Icon(Icons.place),
                 label: 'Places',
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(Icons.history_outlined),
+                activeIcon: Icon(Icons.history),
+                label: 'History',
               ),
               BottomNavigationBarItem(
                 icon: Icon(Icons.settings_outlined),

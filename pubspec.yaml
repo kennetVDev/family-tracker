@@ -23,24 +23,37 @@ dependencies:
   google_maps_flutter: ^2.6.1
   
   # Location
-  geolocator: ^12.0.0
-  geocoding: ^3.0.0
-  
-  # Firebase
-  firebase_core: ^2.32.0
-  firebase_messaging: ^14.9.4
-  
+  geolocator: 11.0.0
+  geocoding: 2.2.0
+
   # Utils
-  go_router: ^14.2.0
   shared_preferences: ^2.2.3
   intl: ^0.19.0
   uuid: ^4.4.0
   http: ^1.2.1
+  
+  # Google Sign In
+  google_sign_in: ^6.2.1
+
+  # Firebase
+  firebase_core: ^3.8.0
+  firebase_messaging: ^15.2.10
+  
+  # Local Notifications
+  flutter_local_notifications: ^17.2.3
+  
+  # Background Location
+  flutter_background_service: ^5.0.10
+  flutter_background_service_android: ^6.2.7
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^4.0.0
+
+dependency_overrides:
+  app_links: 6.3.0
+  geolocator_android: 4.5.0
 
 flutter:
   uses-material-design: true

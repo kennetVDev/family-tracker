@@ -6,11 +6,12 @@ plugins {
 }
 
 android {
-    namespace = "com.familytracker.family_tracker"
-    compileSdk = 34
-    ndkVersion = flutter.ndkVersion
+    namespace = "com.familytracker.app"
+    compileSdk = 35
+    ndkVersion = "27.0.12077973"
 
     compileOptions {
+        coreLibraryDesugaringEnabled true
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
     }
@@ -20,9 +21,9 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.familytracker.family_tracker"
-        minSdk = 21
-        targetSdk = 34
+        applicationId = "com.familytracker.app"
+        minSdk = 24
+        targetSdk = 35
         versionCode = flutter.versionCode
         versionName = flutter.versionName
         multiDexEnabled true
@@ -37,4 +38,15 @@ android {
 
 flutter {
     source = "../.."
+}
+
+dependencies {
+    coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.0.4'
+    
+    // Firebase BoM
+    implementation platform('com.google.firebase:firebase-bom:33.1.2')
+    
+    // Firebase dependencies
+    implementation 'com.google.firebase:firebase-analytics'
+    implementation 'com.google.firebase:firebase-messaging'
 }

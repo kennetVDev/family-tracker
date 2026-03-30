@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/circle_provider.dart';
+import '../../providers/settings_provider.dart';
 import '../auth/login_page.dart';
+import 'profile_page.dart';
 
 class SettingsPage extends ConsumerWidget {
   const SettingsPage({super.key});
@@ -84,11 +87,19 @@ class SettingsPage extends ConsumerWidget {
                   trailing: IconButton(
                     icon: const Icon(Icons.copy),
                     onPressed: () {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Code copied!')),
-                      );
+                      if (circle?.inviteCode != null) {
+                        Clipboard.setData(ClipboardData(text: circle!.inviteCode));
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('Code copied!')),
+                        );
+                      }
                     },
                   ),
+                ),
+                ListTile(
+                  leading: const Icon(Icons.exit_to_app, color: Colors.red),
+                  title: const Text('Leave Circle', style: TextStyle(color: Colors.red)),
+                  onTap: () => _showLeaveCircleDialog(context, ref),
                 ),
               ],
             ),
@@ -97,23 +108,38 @@ class SettingsPage extends ConsumerWidget {
           const Divider(),
 
           // Location Settings
-          SwitchListTile(
-            secondary: const Icon(Icons.location_on),
-            title: const Text('Location Sharing'),
-            subtitle: const Text('Share your location with circle'),
-            value: true,
-            onChanged: (value) {
-              // Toggle location sharing
-            },
-          ),
-
-          SwitchListTile(
-            secondary: const Icon(Icons.notifications),
-            title: const Text('Push Notifications'),
-            subtitle: const Text('Receive place alerts'),
-            value: true,
-            onChanged: (value) {
-              // Toggle notifications
+          Consumer(
+            builder: (context, ref, _) {
+              final settings = ref.watch(settingsProvider);
+              return Column(
+                children: [
+                  SwitchListTile(
+                    secondary: const Icon(Icons.location_on),
+                    title: const Text('Location Sharing'),
+                    subtitle: const Text('Share your location with circle'),
+                    value: settings.locationSharing,
+                    onChanged: (value) {
+                      ref.read(settingsProvider.notifier).toggleLocationSharing(value);
+                    },
+                  ),
+                  SwitchListTile(
+                    secondary: const Icon(Icons.notifications),
+                    title: const Text('Push Notifications'),
+                    subtitle: const Text('Receive place alerts'),
+                    value: settings.pushNotifications,
+                    onChanged: (value) {
+                      ref.read(settingsProvider.notifier).togglePushNotifications(value);
+                    },
+                  ),
+                  ListTile(
+                    leading: const Icon(Icons.timer),
+                    title: const Text('Tracking Interval'),
+                    subtitle: Text('${settings.trackingIntervalSeconds} seconds'),
+                    trailing: const Icon(Icons.chevron_right),
+                    onTap: () => _showIntervalDialog(context, ref, settings.trackingIntervalSeconds),
+                  ),
+                ],
+              );
             },
           ),
 
@@ -125,7 +151,10 @@ class SettingsPage extends ConsumerWidget {
             title: const Text('Edit Profile'),
             trailing: const Icon(Icons.chevron_right),
             onTap: () {
-              // Edit profile
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const ProfilePage()),
+              );
             },
           ),
           ListTile(
@@ -172,6 +201,76 @@ class SettingsPage extends ConsumerWidget {
             },
             style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
             child: const Text('Sign Out'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showLeaveCircleDialog(BuildContext context, WidgetRef ref) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Leave Circle'),
+        content: const Text('Are you sure you want to leave this circle?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () async {
+              await ref.read(circleNotifierProvider.notifier).leaveCircle();
+              Navigator.pop(context);
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Left circle successfully')),
+              );
+            },
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+            child: const Text('Leave'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showIntervalDialog(BuildContext context, WidgetRef ref, int currentInterval) {
+    final intervals = [15, 30, 60, 120, 300];
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Tracking Interval'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: intervals.map((interval) {
+            String label;
+            if (interval < 60) {
+              label = '$interval seconds';
+            } else if (interval < 3600) {
+              label = '${interval ~/ 60} minute${interval ~/ 60 > 1 ? 's' : ''}';
+            } else {
+              label = '${interval ~/ 3600} hour${interval ~/ 3600 > 1 ? 's' : ''}';
+            }
+            return RadioListTile<int>(
+              title: Text(label),
+              value: interval,
+              groupValue: currentInterval,
+              onChanged: (value) {
+                if (value != null) {
+                  ref.read(settingsProvider.notifier).setTrackingInterval(value);
+                  Navigator.pop(context);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Interval set to $label')),
+                  );
+                }
+              },
+            );
+          }).toList(),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
           ),
         ],
       ),

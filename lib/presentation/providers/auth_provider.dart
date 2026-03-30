@@ -12,14 +12,9 @@ final authRepositoryProvider = Provider<AuthRepository>((ref) {
   return AuthRepository(client);
 });
 
-final authStateProvider = StreamProvider<User?>((ref) {
-  final repository = ref.watch(authRepositoryProvider);
-  return repository.authStateChanges;
-});
-
 final currentUserProvider = Provider<User?>((ref) {
-  final authState = ref.watch(authStateProvider);
-  return authState.valueOrNull;
+  final repository = ref.watch(authRepositoryProvider);
+  return repository.currentUser;
 });
 
 final currentProfileProvider = FutureProvider<UserModel?>((ref) async {
@@ -81,6 +76,16 @@ class AuthNotifier extends StateNotifier<AsyncValue<UserModel?>> {
   Future<void> signOut() async {
     await _repository.signOut();
     state = const AsyncValue.data(null);
+  }
+
+  Future<void> signInWithGoogle() async {
+    state = const AsyncValue.loading();
+    try {
+      final user = await _repository.signInWithGoogle();
+      state = AsyncValue.data(user);
+    } catch (e, st) {
+      state = AsyncValue.error(e, st);
+    }
   }
 
   Future<void> updateProfile({

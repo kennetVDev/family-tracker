@@ -25,37 +25,21 @@ class LocationRepository {
   }
 
   Future<List<LocationModel>> getCircleLocations(String circleId) async {
-    final user = _client.auth.currentUser;
-    if (user == null) return [];
-
     final response = await _client
         .from('locations')
         .select()
         .eq('circle_id', circleId)
-        .order('timestamp', descending: true)
         .limit(100);
 
     return response.map((row) => LocationModel.fromMap(row)).toList();
   }
 
   Future<List<LocationModel>> getMemberLocations(String circleId) async {
-    final user = _client.auth.currentUser;
-    if (user == null) return [];
-
-    // Get latest location for each member
     final response = await _client
         .from('locations')
-        .select('''
-          id,
-          user_id,
-          circle_id,
-          latitude,
-          longitude,
-          accuracy,
-          timestamp
-        ''')
+        .select()
         .eq('circle_id', circleId)
-        .order('timestamp', descending: true);
+        .limit(500);
 
     // Group by user and take only the latest
     final Map<String, LocationModel> latestLocations = {};
@@ -67,24 +51,6 @@ class LocationRepository {
     }
 
     return latestLocations.values.toList();
-  }
-
-  Stream<List<LocationModel>> subscribeToLocations(String circleId) {
-    return _client
-        .channel('locations:$circleId')
-        .onPostgresChanges(
-          event: PostgresChangeEvent.insert,
-          schema: 'public',
-          table: 'locations',
-          filter: PostgresChangeFilter(
-            eq: 'circle_id',
-            value: circleId,
-          ),
-          (payload) {
-            return LocationModel.fromMap(payload.newRecord);
-          },
-        )
-        .stream();
   }
 
   Future<void> deleteOldLocations(int daysOld) async {

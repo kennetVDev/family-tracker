@@ -6,8 +6,6 @@ class AuthRepository {
 
   AuthRepository(this._client);
 
-  Stream<User?> get authStateChanges => _client.auth.onAuthStateChanges.map((event) => event.session?.user);
-
   User? get currentUser => _client.auth.currentUser;
 
   Future<UserModel?> getCurrentProfile() async {
@@ -64,6 +62,24 @@ class AuthRepository {
     return profile ?? UserModel(
       id: response.user!.id,
       email: email,
+      createdAt: DateTime.now(),
+    );
+  }
+
+  Future<UserModel> signInWithGoogle() async {
+    final response = await _client.auth.signInWithOAuth(
+      OAuthProvider.google,
+      redirectTo: 'com.familytracker.app://login-callback',
+    );
+
+    if (!response) {
+      throw Exception('Failed to sign in with Google');
+    }
+
+    final profile = await getCurrentProfile();
+    return profile ?? UserModel(
+      id: currentUser!.id,
+      email: currentUser!.email ?? '',
       createdAt: DateTime.now(),
     );
   }

@@ -1,10 +1,10 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../constants/app_constants.dart';
 
-class SupabaseClient {
-  static final SupabaseClient _instance = SupabaseClient._internal();
-  factory SupabaseClient() => _instance;
-  SupabaseClient._internal();
+class AppSupabaseClient {
+  static final AppSupabaseClient _instance = AppSupabaseClient._internal();
+  factory AppSupabaseClient() => _instance;
+  AppSupabaseClient._internal();
 
   late SupabaseClient _client;
   bool _isInitialized = false;
