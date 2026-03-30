@@ -144,9 +144,17 @@ class BackgroundLocationService {
     int intervalSeconds = 30,
   }) async {
     final isRunning = await _service.isRunning();
-    if (!isRunning) {
-      return false;
+    if (isRunning) {
+      _service.invoke('start', {
+        'circleId': circleId,
+        'userId': userId,
+        'intervalSeconds': intervalSeconds,
+      });
+      return true;
     }
+
+    final result = await _service.startService();
+    if (!result) return false;
 
     _service.invoke('start', {
       'circleId': circleId,

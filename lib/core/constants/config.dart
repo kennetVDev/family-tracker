@@ -7,7 +7,7 @@ class AppConfig {
   static const String supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJvYW51bnJpcnl1bHlreGR3Y3RlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ3MTU3NzEsImV4cCI6MjA5MDI5MTc3MX0.wHIfb_gqdJ2lAZpvN2EyPeyz_Ors6az0NBgOzCkW_g4';
   
   // Google Maps API Key
-  static const String googleMapsApiKey = 'AIzaSyC-NM8BMk5pOX-VLlCKRK8q2UxsfMkzSwA';
+  static const String googleMapsApiKey = 'AIzaSyCEy3vUznOizf9_QujUWVpAIeUkt6A3sqA';
   
   // Firebase Configuration (Android)
   static const String androidPackageName = 'com.familytracker.family_tracker';

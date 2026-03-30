@@ -4,6 +4,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 import '../../../data/models/location_model.dart';
 import '../../../data/models/place_model.dart';
+import '../../../data/models/circle_model.dart';
 import '../../../core/utils/map_styles.dart';
 import '../../providers/circle_provider.dart';
 import '../../providers/location_provider.dart';
@@ -34,68 +35,123 @@ class _MapPageState extends ConsumerState<MapPage> {
   bool _isDarkMode = false;
   bool _isBackgroundMode = false;
   List<LocationModel> _realtimeLocations = [];
+  String? _currentUserId;
 
   @override
   void initState() {
     super.initState();
-    _loadData();
-  }
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    _startRealtimeUpdates();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        _loadData();
+        _startRealtimeUpdates();
+      }
+    });
   }
 
   void _startRealtimeUpdates() {
-    final circle = ref.read(circleNotifierProvider).valueOrNull;
-    if (circle != null) {
-      ref.read(realtimeLocationServiceProvider).subscribeToCircleLocations(circle.id);
-    }
-
-    ref.listen<AsyncValue<List<LocationModel>>>(realtimeLocationsProvider, (previous, next) {
-      next.whenData((locations) {
-        _realtimeLocations = locations;
-        _updateMarkersAndCircles();
-      });
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      final circle = ref.read(circleNotifierProvider).valueOrNull;
+      if (circle != null) {
+        ref.read(realtimeLocationServiceProvider).subscribeToCircleLocations(circle.id);
+      }
     });
   }
 
   Future<void> _loadData() async {
-    _currentPosition = await ref.read(currentPositionProvider.future);
-    await _updateMarkersAndCircles();
-    _loadLocations();
+    if (!mounted) return;
+    try {
+      _currentPosition = await ref.read(currentPositionProvider.future);
+    } catch (e) {
+      _currentPosition = null;
+    }
+    if (mounted) {
+      await _updateMarkersAndCircles();
+      _loadLocations();
+    }
   }
 
   Future<void> _updateMarkersAndCircles() async {
+    if (!mounted) return;
+    
     final circleAsync = ref.watch(circleNotifierProvider);
     final circle = circleAsync.valueOrNull;
     if (circle == null) return;
 
-    final locations = _realtimeLocations.isNotEmpty 
-        ? _realtimeLocations 
-        : await ref.read(locationRepositoryProvider).getMemberLocations(circle.id);
-    final places = await ref.read(placeRepositoryProvider).getCirclePlaces(circle.id);
-    final members = await ref.read(circleMembersProvider(circle.id).future);
+    List<LocationModel> locations;
+    List<PlaceModel> places;
+    List<CircleMemberModel> members;
+    
+    try {
+      locations = _realtimeLocations.isNotEmpty 
+          ? _realtimeLocations 
+          : await ref.read(locationRepositoryProvider).getMemberLocations(circle.id);
+    } catch (e) {
+      locations = [];
+    }
+    
+    if (!mounted) return;
+    
+    try {
+      places = await ref.read(placeRepositoryProvider).getCirclePlaces(circle.id);
+    } catch (e) {
+      places = [];
+    }
+    
+    if (!mounted) return;
+    
+    try {
+      members = await ref.read(circleMembersProvider(circle.id).future);
+    } catch (e) {
+      members = [];
+    }
+    
+    if (!mounted) return;
 
     final markers = <Marker>{};
     final circles = <Circle>{};
-    final currentUserId = ref.read(currentUserProvider)?.id;
+    _currentUserId = ref.read(currentUserProvider)?.id;
 
     for (final loc in locations) {
       final member = members.where((m) => m.userId == loc.userId).firstOrNull;
-      final isCurrentUser = loc.userId == currentUserId;
+      final isCurrentUser = loc.userId == _currentUserId;
       
+      if (isCurrentUser) {
+        markers.add(
+          Marker(
+            markerId: const MarkerId('my_location'),
+            position: LatLng(loc.latitude, loc.longitude),
+            infoWindow: const InfoWindow(
+              title: 'Your Location',
+            ),
+            icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueAzure),
+            zIndex: 100,
+          ),
+        );
+      } else {
+        markers.add(
+          Marker(
+            markerId: MarkerId(loc.userId),
+            position: LatLng(loc.latitude, loc.longitude),
+            infoWindow: InfoWindow(
+              title: member?.userName ?? 'Member',
+            ),
+            icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueOrange),
+          ),
+        );
+      }
+    }
+
+    if (_currentPosition != null) {
       markers.add(
         Marker(
-          markerId: MarkerId(loc.userId),
-          position: LatLng(loc.latitude, loc.longitude),
-          infoWindow: InfoWindow(
-            title: member?.userName ?? (isCurrentUser ? 'You' : 'Member'),
+          markerId: const MarkerId('my_gps_location'),
+          position: LatLng(_currentPosition!.latitude, _currentPosition!.longitude),
+          infoWindow: const InfoWindow(
+            title: 'You',
           ),
-          icon: BitmapDescriptor.defaultMarkerWithHue(
-            isCurrentUser ? BitmapDescriptor.hueGreen : BitmapDescriptor.hueOrange,
-          ),
+          icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen),
+          zIndex: 101,
         ),
       );
     }
@@ -213,6 +269,17 @@ class _MapPageState extends ConsumerState<MapPage> {
     final settings = ref.watch(settingsProvider);
     final mapType = ref.watch(mapTypeProvider);
 
+    ref.listen<AsyncValue<List<LocationModel>>>(realtimeLocationsProvider, (previous, next) {
+      next.whenData((locations) {
+        if (mounted) {
+          setState(() {
+            _realtimeLocations = locations;
+          });
+          _updateMarkersAndCircles();
+        }
+      });
+    });
+
     return Scaffold(
       appBar: AppBar(
         title: Text(circleAsync.valueOrNull?.name ?? 'Family Tracker'),
@@ -275,23 +342,62 @@ class _MapPageState extends ConsumerState<MapPage> {
             return const Center(child: CircularProgressIndicator());
           }
 
-          if (position == null) {
-            return const Center(
-              child: Text('Unable to get location. Please check permissions.'),
+          if (snapshot.hasError) {
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(Icons.error, size: 48, color: Colors.red),
+                  const SizedBox(height: 16),
+                  Text('Error: ${snapshot.error}'),
+                  const SizedBox(height: 8),
+                  ElevatedButton(
+                    onPressed: () {
+                      ref.invalidate(currentPositionProvider);
+                    },
+                    child: const Text('Retry'),
+                  ),
+                ],
+              ),
             );
           }
 
-          return GoogleMap(
-            onMapCreated: _onMapCreated,
-            initialCameraPosition: CameraPosition(
-              target: LatLng(position.latitude, position.longitude),
-              zoom: 15,
-            ),
-            myLocationEnabled: true,
-            myLocationButtonEnabled: false,
-            markers: _markers,
-            circles: _circles,
-            mapType: mapType,
+          final LatLng mapCenter;
+          if (position != null) {
+            mapCenter = LatLng(position.latitude, position.longitude);
+          } else {
+            mapCenter = const LatLng(19.4326, -99.1332);
+          }
+
+          return Stack(
+            children: [
+              GoogleMap(
+                onMapCreated: _onMapCreated,
+                initialCameraPosition: CameraPosition(
+                  target: mapCenter,
+                  zoom: 16,
+                ),
+                myLocationEnabled: false,
+                myLocationButtonEnabled: false,
+                markers: _markers,
+                circles: _circles,
+                mapType: mapType,
+                zoomControlsEnabled: false,
+                mapToolbarEnabled: false,
+                compassEnabled: true,
+              ),
+              Positioned(
+                right: 16,
+                bottom: 100,
+                child: FloatingActionButton(
+                  heroTag: 'myLocation',
+                  mini: true,
+                  backgroundColor: Colors.white,
+                  onPressed: _loadLocations,
+                  child: const Icon(Icons.my_location, color: Colors.blue),
+                ),
+              ),
+            ],
           );
         },
       ),
