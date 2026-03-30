@@ -287,7 +287,7 @@ class _MapPageState extends ConsumerState<MapPage> {
           IconButton(
             icon: const Icon(Icons.map),
             onPressed: _cycleMapType,
-            tooltip: 'Change map style',
+            tooltip: 'Cambiar estilo del mapa',
           ),
           if (settings.locationSharing)
             IconButton(
@@ -303,7 +303,7 @@ class _MapPageState extends ConsumerState<MapPage> {
           if (isTracking)
             IconButton(
               icon: Icon(_isBackgroundMode ? Icons.visibility : Icons.visibility_off),
-              tooltip: _isBackgroundMode ? 'Background mode ON' : 'Background mode OFF',
+              tooltip: _isBackgroundMode ? 'Modo segundo plano ON' : 'Modo segundo plano OFF',
               onPressed: () {
                 setState(() {
                   _isBackgroundMode = !_isBackgroundMode;
@@ -312,13 +312,13 @@ class _MapPageState extends ConsumerState<MapPage> {
                   ref.read(locationTrackerProvider.notifier).stopTracking();
                   ref.read(locationTrackerProvider.notifier).startTracking(backgroundMode: true);
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Background tracking enabled')),
+                    const SnackBar(content: Text('Rastreo en segundo plano activado')),
                   );
                 } else {
                   ref.read(locationTrackerProvider.notifier).stopTracking();
                   ref.read(locationTrackerProvider.notifier).startTracking(backgroundMode: false);
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Background tracking disabled')),
+                    const SnackBar(content: Text('Rastreo en segundo plano desactivado')),
                   );
                 }
               },
@@ -421,7 +421,7 @@ class _MapPageState extends ConsumerState<MapPage> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             const Text(
-              'Add Place',
+              'Agregar Lugar',
               style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
@@ -430,8 +430,8 @@ class _MapPageState extends ConsumerState<MapPage> {
             const SizedBox(height: 16),
             const TextField(
               decoration: InputDecoration(
-                labelText: 'Place Name',
-                hintText: 'e.g., Home, School, Work',
+                labelText: 'Nombre del lugar',
+                hintText: 'ej., Casa, Escuela, Trabajo',
                 prefixIcon: Icon(Icons.place),
               ),
             ),
@@ -449,15 +449,15 @@ class _MapPageState extends ConsumerState<MapPage> {
                     showDialog(
                       context: context,
                       builder: (ctx) => AlertDialog(
-                        title: const Text('Add Place'),
+                        title: const Text('Agregar Lugar'),
                         content: Column(
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             TextField(
                               controller: nameController,
                               decoration: const InputDecoration(
-                                labelText: 'Place Name',
-                                hintText: 'e.g., Home, School, Work',
+                                labelText: 'Nombre del lugar',
+                                hintText: 'ej., Casa, Escuela, Trabajo',
                               ),
                             ),
                             const SizedBox(height: 16),
@@ -465,7 +465,7 @@ class _MapPageState extends ConsumerState<MapPage> {
                               controller: radiusController,
                               keyboardType: TextInputType.number,
                               decoration: const InputDecoration(
-                                labelText: 'Radius (meters)',
+                                labelText: 'Radio (metros)',
                               ),
                             ),
                           ],
@@ -473,7 +473,7 @@ class _MapPageState extends ConsumerState<MapPage> {
                         actions: [
                           TextButton(
                             onPressed: () => Navigator.pop(ctx),
-                            child: const Text('Cancel'),
+                            child: const Text('Cancelar'),
                           ),
                           ElevatedButton(
                             onPressed: () async {
@@ -489,11 +489,11 @@ class _MapPageState extends ConsumerState<MapPage> {
                                 Navigator.pop(ctx);
                                 _updateMarkersAndCircles();
                                 ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(content: Text('Place added!')),
+                                  const SnackBar(content: Text('¡Lugar agregado!')),
                                 );
                               }
                             },
-                            child: const Text('Add'),
+                            child: const Text('Agregar'),
                           ),
                         ],
                       ),
@@ -501,7 +501,7 @@ class _MapPageState extends ConsumerState<MapPage> {
                   }
                 }
               },
-              child: const Text('Select Location'),
+              child: const Text('Seleccionar Ubicación'),
             ),
           ],
         ),

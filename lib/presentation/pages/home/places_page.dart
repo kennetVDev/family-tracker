@@ -13,12 +13,12 @@ class PlacesPage extends ConsumerWidget {
     final circle = circleAsync.valueOrNull;
 
     if (circle == null) {
-      return const Center(child: Text('No circle found'));
+      return const Center(child: Text('No se encontró círculo'));
     }
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Places'),
+        title: const Text('Lugares'),
       ),
       body: FutureBuilder(
         future: ref.read(placeRepositoryProvider).getCirclePlaces(circle.id),
@@ -41,7 +41,7 @@ class PlacesPage extends ConsumerWidget {
                   ),
                   const SizedBox(height: 16),
                   Text(
-                    'No places yet',
+                    'No hay lugares aún',
                     style: TextStyle(
                       fontSize: 18,
                       color: Colors.grey[600],
@@ -49,7 +49,7 @@ class PlacesPage extends ConsumerWidget {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    'Add places to get notifications',
+                    'Agrega lugares para recibir notificaciones',
                     style: TextStyle(
                       color: Colors.grey[500],
                     ),

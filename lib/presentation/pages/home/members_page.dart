@@ -12,21 +12,21 @@ class MembersPage extends ConsumerWidget {
     final circle = circleAsync.valueOrNull;
 
     if (circle == null) {
-      return const Center(child: Text('No circle found'));
+      return const Center(child: Text('No se encontró círculo'));
     }
 
     final membersAsync = ref.watch(circleMembersProvider(circle.id));
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Members'),
+        title: const Text('Miembros'),
       ),
       body: membersAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (error, stack) => Center(child: Text('Error: $error')),
         data: (members) {
           if (members.isEmpty) {
-            return const Center(child: Text('No members yet'));
+            return const Center(child: Text('No hay miembros aún'));
           }
 
           return ListView.builder(
@@ -57,7 +57,7 @@ class MembersPage extends ConsumerWidget {
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => _showInviteDialog(context, ref),
         icon: const Icon(Icons.person_add),
-        label: const Text('Invite'),
+        label: const Text('Invitar'),
       ),
     );
   }

@@ -51,27 +51,27 @@ class _HomePageState extends ConsumerState<HomePage> {
               BottomNavigationBarItem(
                 icon: Icon(Icons.map_outlined),
                 activeIcon: Icon(Icons.map),
-                label: 'Map',
+                label: 'Mapa',
               ),
               BottomNavigationBarItem(
                 icon: Icon(Icons.people_outlined),
                 activeIcon: Icon(Icons.people),
-                label: 'Members',
+                label: 'Miembros',
               ),
               BottomNavigationBarItem(
                 icon: Icon(Icons.place_outlined),
                 activeIcon: Icon(Icons.place),
-                label: 'Places',
+                label: 'Lugares',
               ),
               BottomNavigationBarItem(
                 icon: Icon(Icons.history_outlined),
                 activeIcon: Icon(Icons.history),
-                label: 'History',
+                label: 'Historial',
               ),
               BottomNavigationBarItem(
                 icon: Icon(Icons.settings_outlined),
                 activeIcon: Icon(Icons.settings),
-                label: 'Settings',
+                label: 'Ajustes',
               ),
             ],
           ),

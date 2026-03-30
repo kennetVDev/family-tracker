@@ -61,7 +61,7 @@ class _SplashPageState extends ConsumerState<SplashPage> {
             ),
             const SizedBox(height: 8),
             Text(
-              'Keep your family close',
+              'Mantén a tu familia cerca',
               style: TextStyle(
                 fontSize: 16,
                 color: Theme.of(context).colorScheme.onPrimary.withOpacity(0.8),

@@ -104,7 +104,7 @@ class _OnboardingCirclePageState extends ConsumerState<OnboardingCirclePage> {
                 ),
                 const SizedBox(height: 24),
                 Text(
-                  'Create Your Family Circle',
+                  'Crea Tu Círculo Familiar',
                   textAlign: TextAlign.center,
                   style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                     fontWeight: FontWeight.bold,
@@ -112,7 +112,7 @@ class _OnboardingCirclePageState extends ConsumerState<OnboardingCirclePage> {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  'Keep your family close with real-time location sharing',
+                  'Mantén a tu familia cerca con ubicación en tiempo real',
                   textAlign: TextAlign.center,
                   style: TextStyle(color: Colors.grey[600]),
                 ),
@@ -133,7 +133,7 @@ class _OnboardingCirclePageState extends ConsumerState<OnboardingCirclePage> {
                             ),
                             const SizedBox(width: 8),
                             const Text(
-                              'Create New Circle',
+                              'Crear Nuevo Círculo',
                               style: TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,
@@ -145,13 +145,13 @@ class _OnboardingCirclePageState extends ConsumerState<OnboardingCirclePage> {
                         TextFormField(
                           controller: _nameController,
                           decoration: const InputDecoration(
-                            labelText: 'Circle Name',
-                            hintText: 'e.g., My Family',
+                            labelText: 'Nombre del círculo',
+                            hintText: 'ej., Mi Familia',
                             prefixIcon: Icon(Icons.group),
                           ),
                           validator: (value) {
                             if (value == null || value.isEmpty) {
-                              return 'Please enter a name';
+                              return 'Por favor ingresa un nombre';
                             }
                             return null;
                           },
@@ -165,7 +165,7 @@ class _OnboardingCirclePageState extends ConsumerState<OnboardingCirclePage> {
                                 width: 20,
                                 child: CircularProgressIndicator(strokeWidth: 2),
                               )
-                            : const Text('Create Circle'),
+                            : const Text('Crear Círculo'),
                         ),
                       ],
                     ),
@@ -181,7 +181,7 @@ class _OnboardingCirclePageState extends ConsumerState<OnboardingCirclePage> {
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 16),
                       child: Text(
-                        'OR',
+                        'O',
                         style: TextStyle(color: Colors.grey[500]),
                       ),
                     ),
@@ -206,7 +206,7 @@ class _OnboardingCirclePageState extends ConsumerState<OnboardingCirclePage> {
                             ),
                             const SizedBox(width: 8),
                             const Text(
-                              'Join Existing Circle',
+                              'Unirse a un Círculo Existente',
                               style: TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,
@@ -219,15 +219,15 @@ class _OnboardingCirclePageState extends ConsumerState<OnboardingCirclePage> {
                           controller: _codeController,
                           textCapitalization: TextCapitalization.characters,
                           decoration: const InputDecoration(
-                            labelText: 'Invite Code',
-                            hintText: 'Enter 6-character code',
+                            labelText: 'Código de invitación',
+                            hintText: 'Ingresa el código de 6 caracteres',
                             prefixIcon: Icon(Icons.key),
                           ),
                         ),
                         const SizedBox(height: 16),
                         OutlinedButton(
                           onPressed: _isLoading ? null : _joinCircle,
-                          child: const Text('Join Circle'),
+                          child: const Text('Unirse al Círculo'),
                         ),
                       ],
                     ),

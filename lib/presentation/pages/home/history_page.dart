@@ -11,7 +11,7 @@ class HistoryPage extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('History'),
+        title: const Text('Historial'),
       ),
       body: visitsAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
@@ -29,7 +29,7 @@ class HistoryPage extends ConsumerWidget {
                   ),
                   const SizedBox(height: 16),
                   Text(
-                    'No history yet',
+                    'Sin historial aún',
                     style: TextStyle(
                       fontSize: 18,
                       color: Colors.grey[600],
@@ -37,7 +37,7 @@ class HistoryPage extends ConsumerWidget {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    'Visit places to see your history',
+                    'Visita lugares para ver tu historial',
                     style: TextStyle(
                       color: Colors.grey[500],
                     ),
@@ -72,7 +72,7 @@ class HistoryPage extends ConsumerWidget {
                       Text(_formatDate(visit.arrivedAt)),
                       if (duration != null)
                         Text(
-                          'Duration: ${_formatDuration(duration)}',
+                          'Duración: ${_formatDuration(duration)}',
                           style: TextStyle(
                             color: Colors.grey[600],
                             fontSize: 12,
@@ -91,21 +91,22 @@ class HistoryPage extends ConsumerWidget {
   }
 
   String _formatDate(DateTime date) {
+    final localDate = date.toLocal();
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
     final yesterday = today.subtract(const Duration(days: 1));
-    final visitDate = DateTime(date.year, date.month, date.day);
+    final visitDate = DateTime(localDate.year, localDate.month, localDate.day);
 
     String prefix = '';
     if (visitDate == today) {
-      prefix = 'Today';
+      prefix = 'Hoy';
     } else if (visitDate == yesterday) {
-      prefix = 'Yesterday';
+      prefix = 'Ayer';
     } else {
-      prefix = '${date.day}/${date.month}/${date.year}';
+      prefix = '${localDate.day}/${localDate.month}/${localDate.year}';
     }
 
-    return '$prefix at ${date.hour.toString().padLeft(2, '0')}:${date.minute.toString().padLeft(2, '0')}';
+    return '$prefix a las ${localDate.hour.toString().padLeft(2, '0')}:${localDate.minute.toString().padLeft(2, '0')}';
   }
 
   String _formatDuration(Duration duration) {
