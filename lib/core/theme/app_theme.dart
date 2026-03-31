@@ -95,11 +95,11 @@ class AppTheme {
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: AppBorderRadius.mdAll,
-          borderSide: const BorderSide(color: AppColors.error),
+          borderSide: BorderSide(color: AppColors.error),
         ),
         focusedErrorBorder: OutlineInputBorder(
           borderRadius: AppBorderRadius.mdAll,
-          borderSide: const BorderSide(color: AppColors.error, width: 2),
+          borderSide: BorderSide(color: AppColors.error, width: 2),
         ),
       ),
       cardTheme: CardThemeData(
