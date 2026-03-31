@@ -1,0 +1,50 @@
+workflows:
+  ios-workflow:
+    name: iOS Build
+    max_build_duration: 60
+    environment:
+      flutter: stable
+      xcode: latest
+      cocoapods: default
+    scripts:
+      - name: Set up code signing
+        script: |
+          keychain initialize
+          app-store-connect fetch-signing-files "com.familytracker.app" --type IOS_APP_STORE
+          keychain add-certificates
+          xcode-project use-profiles
+      - name: Flutter build iOS
+        script: |
+          flutter packages pub get
+          flutter build ipa --release --verbose
+    artifacts:
+      - build/ios/ipa/*.ipa
+      - build/ios/xcarchive/*.xcarchive
+
+  android-workflow:
+    name: Android Build
+    max_build_duration: 45
+    environment:
+      flutter: stable
+      java: 17
+    scripts:
+      - name: Flutter build Android
+        script: |
+          flutter packages pub get
+          flutter build apk --debug
+    artifacts:
+      - build/app/outputs/flutter-apk/*.apk
+
+  ios-simulator-workflow:
+    name: iOS Simulator Build (No Code Signing)
+    max_build_duration: 45
+    environment:
+      flutter: stable
+      xcode: latest
+    scripts:
+      - name: Flutter build iOS for simulator
+        script: |
+          flutter packages pub get
+          flutter build ios --simulator --no-codesign
+    artifacts:
+      - build/ios/iphonesimulator/*.app
