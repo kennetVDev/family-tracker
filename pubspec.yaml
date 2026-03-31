@@ -45,6 +45,7 @@ dependencies:
   # Background Location
   flutter_background_service: ^5.0.10
   flutter_background_service_android: ^6.2.7
+  flutter_background_service_ios: ^5.0.0
 
 dev_dependencies:
   flutter_test:
@@ -52,7 +53,6 @@ dev_dependencies:
   flutter_lints: ^4.0.0
 
 dependency_overrides:
-  app_links: 6.3.0
   geolocator_android: 4.5.0
 
 flutter:
