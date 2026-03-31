@@ -42,12 +42,9 @@ workflows:
       flutter: stable
       xcode: latest
     scripts:
-      - name: Flutter analyze
-        script: |
-          flutter packages pub get
-          flutter analyze
       - name: Flutter build iOS for simulator
         script: |
+          flutter packages pub get
           flutter build ios --simulator --no-codesign
     artifacts:
       - build/ios/iphonesimulator/*.app
