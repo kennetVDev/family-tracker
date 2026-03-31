@@ -46,5 +46,10 @@ workflows:
         script: |
           flutter packages pub get
           flutter build ios --simulator --no-codesign
+      - name: Fix iOS build
+        script: |
+          rm -rf ios/Pods
+          rm -rf ios/Podfile.lock
+          cd ios && pod install --repo-update
     artifacts:
       - build/ios/iphonesimulator/*.app
