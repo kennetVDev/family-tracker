@@ -129,7 +129,7 @@ class AppTheme {
         shape: RoundedRectangleBorder(borderRadius: AppBorderRadius.smAll),
         behavior: SnackBarBehavior.floating,
       ),
-      dialogTheme: DialogTheme(
+      dialogTheme: DialogThemeData(
         backgroundColor: AppColors.surface,
         shape: RoundedRectangleBorder(borderRadius: AppBorderRadius.xlAll),
         titleTextStyle: AppTextStyles.titleLarge.copyWith(color: AppColors.textPrimary),
