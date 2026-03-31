@@ -42,8 +42,9 @@ workflows:
       flutter: stable
       xcode: latest
     scripts:
-      - name: Flutter build iOS for simulator
+      - name: Flutter clean and build iOS for simulator
         script: |
+          flutter clean
           flutter pub get
           flutter build ios --simulator --no-codesign
     artifacts:
