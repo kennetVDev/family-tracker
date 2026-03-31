@@ -144,7 +144,7 @@ class AppButtonStyles {
 
   static ButtonStyle get outlined => OutlinedButton.styleFrom(
     foregroundColor: AppColors.primary,
-    side: const BorderSide(color: AppColors.primary, width: 1.5),
+    side: BorderSide(color: AppColors.primary, width: 1.5),
     padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
     shape: RoundedRectangleBorder(borderRadius: AppBorderRadius.mdAll),
     textStyle: AppTextStyles.labelLarge,
@@ -184,15 +184,15 @@ class AppInputStyles {
     contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
     border: OutlineInputBorder(
       borderRadius: AppBorderRadius.mdAll,
-      borderSide: const BorderSide(color: AppColors.border),
+      borderSide: BorderSide(color: AppColors.border),
     ),
     enabledBorder: OutlineInputBorder(
       borderRadius: AppBorderRadius.mdAll,
-      borderSide: const BorderSide(color: AppColors.border),
+      borderSide: BorderSide(color: AppColors.border),
     ),
     focusedBorder: OutlineInputBorder(
       borderRadius: AppBorderRadius.mdAll,
-      borderSide: const BorderSide(color: AppColors.primary, width: 2),
+      borderSide: BorderSide(color: AppColors.primary, width: 2),
     ),
     errorBorder: OutlineInputBorder(
       borderRadius: AppBorderRadius.mdAll,
