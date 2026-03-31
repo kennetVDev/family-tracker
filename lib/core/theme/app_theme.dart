@@ -9,7 +9,7 @@ class AppTheme {
     return ThemeData(
       useMaterial3: true,
       brightness: Brightness.light,
-      colorScheme: const ColorScheme.light(
+      colorScheme: ColorScheme.light(
         primary: AppColors.primary,
         onPrimary: AppColors.textOnPrimary,
         primaryContainer: AppColors.primarySurface,
@@ -21,7 +21,7 @@ class AppTheme {
         tertiary: AppColors.accent,
         onTertiary: AppColors.textOnPrimary,
         tertiaryContainer: AppColors.warningLight,
-        onTertiaryContainer: Color(0xFFE65100),
+        onTertiaryContainer: const Color(0xFFE65100),
         error: AppColors.error,
         onError: AppColors.textOnPrimary,
         errorContainer: AppColors.errorLight,
