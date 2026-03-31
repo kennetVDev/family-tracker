@@ -108,7 +108,7 @@ class AppTheme {
         shape: RoundedRectangleBorder(borderRadius: AppBorderRadius.lgAll),
         margin: EdgeInsets.zero,
       ),
-      bottomNavigationBarTheme: const BottomNavigationBarThemeData(
+      bottomNavigationBarTheme: BottomNavigationBarThemeData(
         backgroundColor: AppColors.surface,
         selectedItemColor: AppColors.primary,
         unselectedItemColor: AppColors.textTertiary,
@@ -117,7 +117,7 @@ class AppTheme {
         type: BottomNavigationBarType.fixed,
         elevation: 8,
       ),
-      floatingActionButtonTheme: const FloatingActionButtonThemeData(
+      floatingActionButtonTheme: FloatingActionButtonThemeData(
         backgroundColor: AppColors.primary,
         foregroundColor: AppColors.textOnPrimary,
         elevation: 4,
@@ -135,13 +135,13 @@ class AppTheme {
         titleTextStyle: AppTextStyles.titleLarge.copyWith(color: AppColors.textPrimary),
         contentTextStyle: AppTextStyles.bodyMedium.copyWith(color: AppColors.textSecondary),
       ),
-      bottomSheetTheme: const BottomSheetThemeData(
+      bottomSheetTheme: BottomSheetThemeData(
         backgroundColor: AppColors.surface,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
         ),
       ),
-      dividerTheme: const DividerThemeData(
+      dividerTheme: DividerThemeData(
         color: AppColors.divider,
         thickness: 1,
         space: 1,
