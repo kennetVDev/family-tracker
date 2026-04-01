@@ -23,9 +23,9 @@ jobs:
           path: |
             ~/.pub-cache
             build/
-          key: ${{ runner.os }}-flutter-${{ hashFiles('**/pubspec.lock') }}
+          key: ${{ runner.os }}-flutter-v2-${{ hashFiles('**/pubspec.yaml') }}
           restore-keys: |
-            ${{ runner.os }}-flutter-
+            ${{ runner.os }}-flutter-v2-
 
       - name: Install dependencies
         run: |
