@@ -17,7 +17,7 @@ dependencies:
   flutter_riverpod: ^2.5.1
   
   # Supabase
-  supabase_flutter: ^2.12.2
+  supabase_flutter: ^2.8.0
   
   # Google Maps
   google_maps_flutter: ^2.6.1
