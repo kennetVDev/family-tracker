@@ -28,7 +28,9 @@ jobs:
             ${{ runner.os }}-flutter-
 
       - name: Install dependencies
-        run: flutter pub get
+        run: |
+          rm -f pubspec.lock
+          flutter pub get
 
       - name: Build iOS (no codesign)
         run: flutter build ios --debug --no-codesign
