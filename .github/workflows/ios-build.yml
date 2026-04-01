@@ -1,15 +1,16 @@
-name: Android Build
+name: iOS Build
 
 on:
   push:
     branches: [main]
   pull_request:
     branches: [main]
+  workflow_dispatch:  # Permite ejecutar manualmente
 
 jobs:
-  android-build:
-    runs-on: ubuntu-latest
-    
+  ios-build:
+    runs-on: macos-latest
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -18,17 +19,27 @@ jobs:
         uses: subosito/flutter-action@v2
         with:
           flutter-version: '3.27.0'
+          channel: 'stable'
+
+      - name: Cache Flutter dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.pub-cache
+            build/
+          key: ${{ runner.os }}-flutter-${{ hashFiles('**/pubspec.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-flutter-
 
       - name: Install dependencies
-        run: |
-          flutter pub get
+        run: flutter pub get
 
-      - name: Build Android APK
-        run: |
-          flutter build apk --debug
+      - name: Build iOS (no codesign)
+        run: flutter build ios --debug --no-codesign
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: android-debug-apk
-          path: build/app/outputs/flutter-apk/app-debug.apk
+          name: ios-debug-app
+          path: build/ios/iphoneos/Runner.app
+          retention-days: 7
