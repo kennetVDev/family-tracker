@@ -42,85 +42,9 @@ workflows:
       flutter: stable
       xcode: latest
     scripts:
-      - name: Recreate iOS folder and build
+      - name: Simple iOS build
         script: |
-          # Backup important iOS files
-          cp -r ios/Runner/Info.plist /tmp/Info.plist.backup 2>/dev/null || true
-          cp -r ios/Runner/Assets.xcassets /tmp/Assets.xcassets.backup 2>/dev/null || true
-          
-          # Delete ios folder
-          rm -rf ios
-          
-          # Recreate ios folder with Flutter
-          flutter create --platforms=ios .
-          
-          # Restore Info.plist (we need to add location permissions back)
-          cat > ios/Runner/Info.plist << 'EOF'
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-<plist version="1.0">
-<dict>
-	<key>CFBundleDevelopmentRegion</key>
-	<string>$(DEVELOPMENT_LANGUAGE)</string>
-	<key>CFBundleDisplayName</key>
-	<string>Family Tracker</string>
-	<key>CFBundleExecutable</key>
-	<string>$(EXECUTABLE_NAME)</string>
-	<key>CFBundleIdentifier</key>
-	<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
-	<key>CFBundleInfoDictionaryVersion</key>
-	<string>6.0</string>
-	<key>CFBundleName</key>
-	<string>family_tracker</string>
-	<key>CFBundlePackageType</key>
-	<string>APPL</string>
-	<key>CFBundleShortVersionString</key>
-	<string>$(FLUTTER_BUILD_NAME)</string>
-	<key>CFBundleSignature</key>
-	<string>????</string>
-	<key>CFBundleVersion</key>
-	<string>$(FLUTTER_BUILD_NUMBER)</string>
-	<key>LSRequiresIPhoneOS</key>
-	<true/>
-	<key>UILaunchStoryboardName</key>
-	<string>LaunchScreen</string>
-	<key>UIMainStoryboardFile</key>
-	<string>Main</string>
-	<key>UISupportedInterfaceOrientations</key>
-	<array>
-		<string>UIInterfaceOrientationPortrait</string>
-		<string>UIInterfaceOrientationLandscapeLeft</string>
-		<string>UIInterfaceOrientationLandscapeRight</string>
-	</array>
-	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>Family Tracker necesita tu ubicación para compartir tu posición con tu familia.</string>
-	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-	<string>Family Tracker necesita tu ubicación en segundo plano para notificaciones de llegada y salida.</string>
-	<key>UIBackgroundModes</key>
-	<array>
-		<string>location</string>
-		<string>fetch</string>
-		<string>remote-notification</string>
-	</array>
-</dict>
-</plist>
-EOF
-          
-          # Update Podfile for minimum iOS version
-          echo 'platform :ios, "14.0"' > ios/Podfile
-          echo 'target "Runner" do' >> ios/Podfile
-          echo '  use_frameworks!' >> ios/Podfile
-          echo 'end' >> ios/Podfile
-          echo '' >> ios/Podfile
-          echo 'post_install do |installer|' >> ios/Podfile
-          echo '  installer.pods_project.targets.each do |target|' >> ios/Podfile
-          echo '    target.build_configurations.each do |config|' >> ios/Podfile
-          echo '      config.build_settings["IPHONEOS_DEPLOYMENT_TARGET"] = "14.0"' >> ios/Podfile
-          echo '    end' >> ios/Podfile
-          echo '  end' >> ios/Podfile
-          echo 'end' >> ios/Podfile
-          
-          # Now build
+          flutter clean
           flutter pub get
           rm -rf ios/Pods ios/Podfile.lock
           cd ios && pod install --repo-update
