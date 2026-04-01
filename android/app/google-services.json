@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "220629323801",
+    "project_id": "kennetvillanescv",
+    "storage_bucket": "kennetvillanescv.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:220629323801:android:c252dcdbbd21c114c01a88",
+        "android_client_info": {
+          "package_name": "com.familytracker.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC-NM8BMk5pOX-VLlCKRK8q2UxsfMkzSwA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
