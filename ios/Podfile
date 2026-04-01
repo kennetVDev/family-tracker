@@ -1,7 +1,7 @@
 platform :ios, '14.0'
 
 target 'Runner' do
-  use_frameworks! :linkage => :static
+  use_frameworks!
 end
 
 post_install do |installer|
