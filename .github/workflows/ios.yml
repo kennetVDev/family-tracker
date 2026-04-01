@@ -23,12 +23,10 @@ jobs:
           rm -rf ios/Pods
           rm -rf ios/Podfile.lock
           rm -f pubspec.lock
-
-      - name: Disable caching
-        run: echo "NO_CACHE=1" >> $GITHUB_ENV
+          rm -rf ~/.pub-cache/hosted/pub.dev/supabase*
 
       - name: Install dependencies
-        run: flutter pub get
+        run: flutter pub get --no-precompile
 
       - name: Build iOS (no codesign)
         run: flutter build ios --debug --no-codesign
