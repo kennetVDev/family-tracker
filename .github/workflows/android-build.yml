@@ -1,11 +1,7 @@
 name: Android Build
 
 on:
-  push:
-    branches: [main]
-  pull_request:
-    branches: [main]
-  workflow_dispatch:  # Permite ejecutar manualmente
+  workflow_dispatch:  # Solo ejecución manual
 
 jobs:
   ios-build:
