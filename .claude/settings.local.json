@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(C:/Python313/python.exe:*)",
+      "Bash(sed:*)"
+    ]
+  },
+  "mcp": {
+    "engram": {
+      "type": "stdio",
+      "command": "engram",
+      "args": ["mcp", "--project=family-tracker"]
+    }
+  }
+}
