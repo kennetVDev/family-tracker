@@ -46,6 +46,9 @@ workflows:
         script: |
           flutter clean
           flutter pub get
+          # Remove app_links from plugin registry if causing issues
+          rm -rf ios/.symlinks
+          rm -f ios/Runner/GeneratedPluginRegistrant.m
           flutter build ios --simulator --no-codesign
     artifacts:
       - build/ios/iphonesimulator/*.app
