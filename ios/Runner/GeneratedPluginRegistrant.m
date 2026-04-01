@@ -6,13 +6,6 @@
 
 #import "GeneratedPluginRegistrant.h"
 
-// NOTE: app_links disabled due to iOS build issues - using supabase without deep links
-// #if __has_include(<app_links/AppLinksPlugin.h>)
-// #import <app_links/AppLinksPlugin.h>
-// #else
-// @import app_links;
-// #endif
-
 #if __has_include(<firebase_core/FLTFirebaseCorePlugin.h>)
 #import <firebase_core/FLTFirebaseCorePlugin.h>
 #else
@@ -82,8 +75,6 @@
 @implementation GeneratedPluginRegistrant
 
 + (void)registerWithRegistry:(NSObject<FlutterPluginRegistry>*)registry {
-  // AppLinks disabled due to iOS build issues
-  // [AppLinksPlugin registerWithRegistrar:[registry registrarForPlugin:@"AppLinksPlugin"]];
   [FLTFirebaseCorePlugin registerWithRegistrar:[registry registrarForPlugin:@"FLTFirebaseCorePlugin"]];
   [FLTFirebaseMessagingPlugin registerWithRegistrar:[registry registrarForPlugin:@"FLTFirebaseMessagingPlugin"]];
   [FlutterBackgroundServicePlugin registerWithRegistrar:[registry registrarForPlugin:@"FlutterBackgroundServicePlugin"]];
