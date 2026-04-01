@@ -27,6 +27,9 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-flutter-v2-
 
+      - name: Clean pub cache
+        run: rm -rf ~/.pub-cache/hosted/pub.dev/supabase_flutter*
+
       - name: Install dependencies
         run: |
           rm -f pubspec.lock
