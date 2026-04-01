@@ -42,13 +42,18 @@ workflows:
       flutter: stable
       xcode: latest
     scripts:
-      - name: Flutter clean and build iOS for simulator
+      - name: Flutter clean and fresh iOS build
         script: |
           flutter clean
-          flutter pub get
-          # Remove app_links from plugin registry if causing issues
+          # Remove all iOS build artifacts
+          rm -rf ios/Pods
+          rm -rf ios/Podfile.lock
           rm -rf ios/.symlinks
-          rm -f ios/Runner/GeneratedPluginRegistrant.m
+          rm -rf ios/build
+          rm -rf ~/Library/Developer/Xcode/DerivedData/Runner-*
+          flutter pub get
+          cd ios && pod install --repo-update
+          cd ..
           flutter build ios --simulator --no-codesign
     artifacts:
       - build/ios/iphonesimulator/*.app
