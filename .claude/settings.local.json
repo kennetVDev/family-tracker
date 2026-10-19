@@ -2,14 +2,31 @@
   "permissions": {
     "allow": [
       "Bash(C:/Python313/python.exe:*)",
-      "Bash(sed:*)"
+      "Bash(sed:*)",
+      "mcp__engram-memory__engram_context",
+      "Bash(git show:*)",
+      "Bash(flutter pub:*)",
+      "Bash(where flutter:*)",
+      "Bash(ls -d /c/flutter*/bin/flutter)",
+      "Read(//c/Users/kenne/flutter/bin/**)",
+      "Bash(/c/flutter/bin/flutter pub:*)",
+      "Bash(/c/flutter/bin/flutter build:*)",
+      "Bash(gh workflow:*)",
+      "Bash(gh run:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)",
+      "WebSearch"
     ]
   },
   "mcp": {
     "engram": {
       "type": "stdio",
       "command": "engram",
-      "args": ["mcp", "--project=family-tracker"]
+      "args": [
+        "mcp",
+        "--project=family-tracker"
+      ]
     }
   }
 }
